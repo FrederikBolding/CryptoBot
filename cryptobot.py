@@ -64,6 +64,7 @@ bot = commands.Bot(command_prefix='.', description=description)
 
 @bot.event
 async def on_ready():
+    """Event called when the bot is ready"""
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
@@ -72,6 +73,7 @@ async def on_ready():
 
 @bot.group(pass_context=True)
 async def crypto(ctx):
+    """Base command to work as a prefix"""
     if ctx.invoked_subcommand is None:
         await bot.say('Oops, thats an invalid command!')
 
@@ -86,12 +88,21 @@ async def ticker(*, args: str):
         info = getTicker(a[0], a[1])
     elif len(a) == 1:
         info = getTicker(a[0], currency)
-    await bot.say(info["name"] + " (" + info["symbol"] + ") is currently priced at " + str(info["prices"][currency.upper()]) + " " + currency.upper() + ".\n\nThe price has changed with: " + formatPercentage(info["percent_change_1h"]) + " in the last hour, " + formatPercentage(info["percent_change_24h"]) + " in the last 24 hours, and " + formatPercentage(info["percent_change_7d"]) + " in the last 7 days.\n\nData from: <https://coinmarketcap.com/> - Last Updated: " + datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S'))
+    await bot.say(info["name"] + " (" + info["symbol"] + ") is currently priced at " +
+                  str(info["prices"][currency.upper()]) + " " + currency.upper() +
+                  ".\n\nThe price has changed by: " +
+                  formatPercentage(info["percent_change_1h"]) + " in the past hour, "
+                  + formatPercentage(info["percent_change_24h"]) +
+                  " in the past 24 hours, and "
+                  + formatPercentage(info["percent_change_7d"]) + " in the past 7 days."
+                  + "\n\nData from: <https://coinmarketcap.com/> - Last updated at: "
+                  + datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S'))
 
 
 @crypto.command()
 async def source():
     """Posts a link to the bot GitHub page."""
-    await bot.say("The source can be found here: https://github.com/FrederikBolding/CryptoBot")
+    await bot.say("The source can be found here: " +
+                  "https://github.com/FrederikBolding/CryptoBot")
 
 bot.run(token)
