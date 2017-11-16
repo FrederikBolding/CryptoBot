@@ -1,4 +1,5 @@
 # CryptoBot
+[![Build Status](https://travis-ci.org/FrederikBolding/CryptoBot.svg?branch=master)](https://travis-ci.org/FrederikBolding/CryptoBot)
 
 ## Dependencies
 - [Discord.py](https://github.com/Rapptz/discord.py)
