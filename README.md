@@ -9,4 +9,4 @@
 Contributions to the project are highly welcomed, feel free to submit issues as well as pull requests.
 
 ## License
-This project is licensed under [MIT license](LICENSE.md)
+This project is licensed under [MIT license](LICENSE)
