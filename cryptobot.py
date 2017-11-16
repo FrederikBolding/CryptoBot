@@ -1,4 +1,5 @@
 import configparser
+import os
 import requests
 
 import discord
@@ -18,6 +19,15 @@ def getTicker(crypto, currency):
 config = configparser.ConfigParser()
 print("Reading config..")
 config.read('config.ini')
+
+if config["DEFAULT"]:
+    token = config["DEFAULT"]["token"]
+elif os.environ.get("token",None):
+    token = os.environ["token"]
+else:
+    print("No config file found :(")
+    raise ValueError("Missing config/token")
+
 
 description = '''A bot that helps you keep track of the latest in crypto.'''
 bot = commands.Bot(command_prefix='.', description=description)
@@ -51,4 +61,4 @@ async def source():
     """Posts a link to the bot GitHub page."""
     await bot.say("The source can be found here: https://github.com/FrederikBolding/CryptoBot")
 
-bot.run(config["DEFAULT"]["token"])
+bot.run(token)
