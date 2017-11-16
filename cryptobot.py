@@ -18,6 +18,13 @@ def getTicker(crypto, currency):
     return crypto_dict[crypto.upper()]
 
 
+def formatPercentage(value):
+    output = ""
+    if float(value) > 0:
+        output += "+"
+    return output + value + "%"
+
+
 config = configparser.ConfigParser()
 print("Reading config..")
 config.read('config.ini')
@@ -59,7 +66,7 @@ async def ticker(*, args: str):
         info = getTicker(a[0], a[1])
     elif len(a) == 1:
         info = getTicker(a[0], currency)
-    await bot.say(info["name"] + " (" + info["symbol"] + ") is currently priced at " + info["price_" + currency.lower()] + " " + currency.upper() + ".")
+    await bot.say(info["name"] + " (" + info["symbol"] + ") is currently priced at " + info["price_" + currency.lower()] + " " + currency.upper() + ".\n\nThe price has changed with: " + formatPercentage(info["percent_change_1h"]) + " in the last hour, " + formatPercentage(info["percent_change_24h"]) + " in the last 24 hours, and " + formatPercentage(info["percent_change_7d"]) + " in the last 7 days.")
 
 
 @crypto.command()
