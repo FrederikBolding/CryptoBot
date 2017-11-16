@@ -27,6 +27,9 @@ def getTicker(crypto, currency):
             for rate in rates:
                 prices[rate] = float(c["price_usd"]) * rates[rate]
             c["prices"] = prices
+            c["percent_change_1h"] = formatPercentage(c["percent_change_1h"])
+            c["percent_change_24h"] = formatPercentage(c["percent_change_24h"])
+            c["percent_change_7d"] = formatPercentage(c["percent_change_7d"])
             crypto_dict[c["symbol"].upper()] = c
     return crypto_dict[crypto.upper()]
 
@@ -88,15 +91,13 @@ async def ticker(*, args: str):
         info = getTicker(a[0], a[1])
     elif len(a) == 1:
         info = getTicker(a[0], currency)
-    await bot.say(info["name"] + " (" + info["symbol"] + ") is currently priced at " +
-                  str(info["prices"][currency.upper()]) + " " + currency.upper() +
-                  ".\n\nThe price has changed by: " +
-                  formatPercentage(info["percent_change_1h"]) + " in the past hour, "
-                  + formatPercentage(info["percent_change_24h"]) +
-                  " in the past 24 hours, and "
-                  + formatPercentage(info["percent_change_7d"]) + " in the past 7 days."
-                  + "\n\nData from: <https://coinmarketcap.com/> - Last updated at: "
-                  + datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S'))
+
+    await bot.say("""{} ({}) is currently priced at {} {}.\n\nThe price has changed by: {} in the past hour, {} in the past 24 hours, and {} in the past 7 days.\n\nData from: <https://coinmarketcap.com/> - Last updated at: {}"""
+                  .format(info["name"], info["symbol"],
+                          str(info["prices"][currency.upper()]),
+                          currency.upper(), info["percent_change_1h"],
+                          info["percent_change_24h"], info["percent_change_7d"],
+                          datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S')))
 
 
 @crypto.command()
