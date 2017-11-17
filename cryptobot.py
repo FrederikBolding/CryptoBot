@@ -31,7 +31,19 @@ def getTicker(crypto, currency):
             c["percent_change_24h"] = formatPercentage(c["percent_change_24h"])
             c["percent_change_7d"] = formatPercentage(c["percent_change_7d"])
             crypto_dict[c["symbol"].upper()] = c
-    return crypto_dict[crypto.upper()]
+    if crypto.upper() in crypto_dict:
+        return crypto_dict[crypto.upper()]
+    else:
+        return None
+
+
+def getPriceValue(name):
+    ticker = getTicker(name, "USD")
+    if ticker:
+        return (0, float(ticker["prices"]["USD"]))
+    elif name in rates:
+        return (1, float(rates[name]))
+    return None
 
 
 def formatPercentage(value):
@@ -92,12 +104,51 @@ async def ticker(*, args: str):
     elif len(a) == 1:
         info = getTicker(a[0], currency)
 
-    await bot.say("""{} ({}) is currently priced at {} {}.\n\nThe price has changed by: {} in the past hour, {} in the past 24 hours, and {} in the past 7 days.\n\nData from: <https://coinmarketcap.com/> - Last updated at: {}"""
-                  .format(info["name"], info["symbol"],
-                          str(info["prices"][currency.upper()]),
-                          currency.upper(), info["percent_change_1h"],
-                          info["percent_change_24h"], info["percent_change_7d"],
-                          datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S')))
+    if info:
+        if currency.upper() in info["prices"]:
+            await bot.say("""{} ({}) is currently priced at {} {}.\n\nThe price has changed by: {} in the past hour, {} in the past 24 hours, and {} in the past 7 days.\n\nData from: <https://coinmarketcap.com/> - Last updated at: {}"""
+                          .format(info["name"], info["symbol"],
+                                  str(info["prices"][currency.upper()]),
+                                  currency.upper(), info["percent_change_1h"],
+                                  info["percent_change_24h"], info["percent_change_7d"],
+                                  datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S')))
+        else:
+            await bot.say("I couldn't find a currency called: {}".format(currency))
+    else:
+        await bot.say("I couldn't find a crypto called: {}".format(a[0]))
+
+
+@ticker.error
+async def ticker_error(error, ctx):
+    """Posts an error message in case of an error with the ticker method."""
+    if isinstance(error, commands.UserInputError):
+        await bot.say("Invalid input.")
+    else:
+        await bot.say("Oops, something bad happened..")
+
+
+@crypto.command()
+async def convert(*, args: str):
+    """Converts a crypto to a crypto or a currency"""
+    a = args.split(" ")
+    value = float(a[0])
+    price_from = getPriceValue(a[1].upper())
+    price_to = getPriceValue(a[2].upper())
+    if value != None and price_from != None and price_to != None:
+        if price_to[0] == 0:
+            total = value * (price_from[1] / price_to[1])
+        else:
+            total = value * (price_from[1] * price_to[1])
+        await bot.say("{} {} is the same as {} {}".format(value, a[1].upper(), total, a[2].upper()))
+
+
+@convert.error
+async def convert_error(error, ctx):
+    """Posts an error message in case of an error with the convert method."""
+    if isinstance(error, commands.UserInputError):
+        await bot.say("Invalid input.")
+    else:
+        await bot.say("Oops, something bad happened..")
 
 
 @crypto.command()
