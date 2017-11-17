@@ -134,7 +134,7 @@ async def convert(*, args: str):
     value = float(a[0])
     price_from = getPriceValue(a[1].upper())
     price_to = getPriceValue(a[2].upper())
-    if value != None and price_from != None and price_to != None:
+    if value is not None and price_from is not None and price_to is not None:
         if price_to[0] == 0:
             total = value * (price_from[1] / price_to[1])
         else:
