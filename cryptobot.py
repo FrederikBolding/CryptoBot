@@ -55,6 +55,14 @@ def formatPercentage(value):
     return "null"
 
 
+def roundValue(value):
+    value = float(value)
+    if value >= 1:
+        return round(value, 2)
+    else:
+        return value
+
+
 config = configparser.ConfigParser()
 print("Reading config..")
 config.read('config.ini')
@@ -103,7 +111,8 @@ async def ticker(*, args: str):
         if currency.upper() in info["prices"]:
             await bot.say("""{} ({}) is currently priced at {} {}.\n\nThe price has changed by: {} in the past hour, {} in the past 24 hours, and {} in the past 7 days.\n\nData from: <https://coinmarketcap.com/> - Last updated at: {}"""
                           .format(info["name"], info["symbol"],
-                                  str(info["prices"][currency.upper()]),
+                                  str(roundValue(
+                                      info["prices"][currency.upper()])),
                                   currency.upper(), info["percent_change_1h"],
                                   info["percent_change_24h"], info["percent_change_7d"],
                                   datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S')))
@@ -135,7 +144,7 @@ async def convert(*, args: str):
             total = value * (price_from[1] / price_to[1])
         else:
             total = value * (price_from[1] * price_to[1])
-        await bot.say("{} {} is the same as {} {}".format(value, a[1].upper(), total, a[2].upper()))
+        await bot.say("{} {} is the same as {} {}".format(roundValue(value), a[1].upper(), roundValue(total), a[2].upper()))
 
 
 @convert.error
