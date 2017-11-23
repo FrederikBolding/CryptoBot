@@ -47,10 +47,12 @@ def getPriceValue(name):
 
 
 def formatPercentage(value):
-    output = ""
-    if float(value) > 0:
-        output += "+"
-    return output + value + "%"
+    if value:
+        output = ""
+        if float(value) > 0:
+            output += "+"
+        return output + value + "%"
+    return "null"
 
 
 config = configparser.ConfigParser()
