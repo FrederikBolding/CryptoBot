@@ -121,6 +121,7 @@ async def ticker(*, args: str):
 @ticker.error
 async def ticker_error(error, ctx):
     """Posts an error message in case of an error with the ticker method."""
+    print(error)
     if isinstance(error, commands.UserInputError):
         await bot.say("Invalid input.")
     else:
@@ -145,6 +146,7 @@ async def convert(*, args: str):
 @convert.error
 async def convert_error(error, ctx):
     """Posts an error message in case of an error with the convert method."""
+    print(error)
     if isinstance(error, commands.UserInputError):
         await bot.say("Invalid input.")
     else:
