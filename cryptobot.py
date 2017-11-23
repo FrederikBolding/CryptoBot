@@ -74,7 +74,7 @@ last_crypto_update = datetime.min
 
 
 description = '''A bot that helps you keep track of the latest in crypto.'''
-bot = commands.Bot(command_prefix='.', description=description)
+bot = commands.Bot(command_prefix='.crypto ', description=description)
 
 
 @bot.event
@@ -86,14 +86,7 @@ async def on_ready():
     print('------')
 
 
-@bot.group(pass_context=True)
-async def crypto(ctx):
-    """Base command to work as a prefix"""
-    if ctx.invoked_subcommand is None:
-        await bot.say('Oops, thats an invalid command!')
-
-
-@crypto.command()
+@bot.command()
 async def ticker(*, args: str):
     """Posts a ticker message with details about the crypto"""
     a = args.split(" ")
@@ -128,7 +121,7 @@ async def ticker_error(error, ctx):
         await bot.say("Oops, something bad happened..")
 
 
-@crypto.command()
+@bot.command()
 async def convert(*, args: str):
     """Converts a crypto to a crypto or a currency"""
     a = args.split(" ")
@@ -153,7 +146,7 @@ async def convert_error(error, ctx):
         await bot.say("Oops, something bad happened..")
 
 
-@crypto.command()
+@bot.command()
 async def source():
     """Posts a link to the bot GitHub page."""
     await bot.say("The source can be found here: " +
