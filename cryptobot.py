@@ -100,6 +100,7 @@ async def on_ready():
 @bot.command()
 async def ticker(*, args: str):
     """Posts a ticker message with details about the crypto"""
+    bot.type()
     a = args.split(" ")
     currency = "USD"
     if len(a) > 1:
@@ -109,14 +110,14 @@ async def ticker(*, args: str):
         info = getTicker(a[0], currency)
 
     if info:
+
         if currency.upper() in info["prices"]:
-            await bot.say("""{} ({}) is currently priced at {} {}.\n\nThe price has changed by: {} in the past hour, {} in the past 24 hours, and {} in the past 7 days.\n\nData from: <https://coinmarketcap.com/> - Last updated at: {}"""
-                          .format(info["name"], info["symbol"],
+            em = discord.Embed(title='{} ({}-{})'.format(info["name"], info["symbol"], currency.upper()), description="""\n**Ranked:** #{}\n\n**Current price:** {} {}\n\n**Price changes**:\n{} in the past hour\n{} in the past 24 hours\n{} in the past 7 days""".format(info["rank"],
                                   str(roundValue(
                                       info["prices"][currency.upper()])),
                                   currency.upper(), info["percent_change_1h"],
-                                  info["percent_change_24h"], info["percent_change_7d"],
-                                  datetime.fromtimestamp(int(info["last_updated"])).strftime('%Y-%m-%d %H:%M:%S')))
+                                  info["percent_change_24h"], info["percent_change_7d"]), colour = 0x00FF00,timestamp = datetime.fromtimestamp(int(info["last_updated"])))
+            await bot.say(embed = em)
         else:
             await bot.say("I couldn't find a currency called: {}".format(currency))
     else:
@@ -136,15 +137,16 @@ async def ticker_error(error, ctx):
 @bot.command()
 async def convert(*, args: str):
     """Converts a crypto to a crypto or a currency"""
-    a = args.split(" ")
-    value = float(a[0])
-    price_from = getPriceValue(a[1].upper())
-    price_to = getPriceValue(a[2].upper())
+    bot.type()
+    a=args.split(" ")
+    value=float(a[0])
+    price_from=getPriceValue(a[1].upper())
+    price_to=getPriceValue(a[2].upper())
     if value is not None and price_from is not None and price_to is not None:
         if price_to[0] == 0:
-            total = value * (price_from[1] / price_to[1])
+            total=value * (price_from[1] / price_to[1])
         else:
-            total = value * (price_from[1] * price_to[1])
+            total=value * (price_from[1] * price_to[1])
         await bot.say("{} {} is the same as {} {}".format(roundValue(value), a[1].upper(), roundValue(total), a[2].upper()))
 
 
