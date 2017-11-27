@@ -93,6 +93,7 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
+    print("I am a member of " + str(len(bot.servers)) + " server(s)")
     print('------')
 
 
