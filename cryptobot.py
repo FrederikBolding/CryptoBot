@@ -115,16 +115,14 @@ async def ticker(*, args: str):
         if currency in info["prices"]:
             em = discord.Embed(title='{} ({}-{})'.format(info["name"], info["symbol"], currency),
                                description="""
-                               \n**Ranked:** #{}
-                               \n\n**Current price:** {} {}
-                               \n\n**Price changes**:\n
-                               {} in the past hour\n
-                               {} in the past 24 hours\n
-                               {} in the past 7 days""".format(info["rank"],
-                                                               str(roundValue(
-                                                                   info["prices"][currency])),
-                                                               currency, info["percent_change_1h"],
-                                                               info["percent_change_24h"], info["percent_change_7d"]), colour=0x00FF00, timestamp=datetime.fromtimestamp(int(info["last_updated"])))
+                               **Ranked:** #{}
+                               \n**Current price:** {} {}
+                               \n**Price changes**:\n{} in the past hour\n{} in the past 24 hours\n{} in the past 7 days""".format(info["rank"],
+                                                                                                                                   str(roundValue(
+                                                                                                                                       info["prices"][currency])),
+                                                                                                                                   currency, info[
+                                                                                                                                       "percent_change_1h"],
+                                                                                                                                   info["percent_change_24h"], info["percent_change_7d"]), colour=0x00FF00, timestamp=datetime.fromtimestamp(int(info["last_updated"])))
             await bot.say(embed=em)
         else:
             await bot.say("I couldn't find a currency called: {}".format(currency))
