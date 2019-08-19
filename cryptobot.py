@@ -93,22 +93,13 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
-    print("I am a member of " + str(len(bot.servers)) + " server(s)")
     print('------')
 
 
 @bot.command()
-async def ticker(*, args: str):
+async def ticker(ctx, crypto: str, currency="USD"):
     """Posts a ticker message with details about the crypto"""
-    bot.type()
-    a = args.split(" ")
-    currency = "USD"
-    if len(a) > 1:
-        currency = a[1]
-        info = getTicker(a[0], a[1])
-    elif len(a) == 1:
-        info = getTicker(a[0], currency)
-
+    info = getTicker(crypto, currency.lower())
     currency = currency.upper()
 
     if info:
@@ -123,53 +114,50 @@ async def ticker(*, args: str):
                                                                                                                                    currency, info[
                                                                                                                                        "percent_change_1h"],
                                                                                                                                    info["percent_change_24h"], info["percent_change_7d"]), colour=0x00FF00, timestamp=datetime.fromtimestamp(int(info["last_updated"])))
-            await bot.say(embed=em)
+            await ctx.send(embed=em)
         else:
-            await bot.say("I couldn't find a currency called: {}".format(currency))
+            await ctx.send("I couldn't find a currency called: {}".format(currency))
     else:
-        await bot.say("I couldn't find a crypto called: {}".format(a[0]))
+        await ctx.send("I couldn't find a crypto called: {}".format(crypto))
 
 
 @ticker.error
-async def ticker_error(error, ctx):
+async def ticker_error(ctx, error):
     """Posts an error message in case of an error with the ticker method."""
     print(error)
     if isinstance(error, commands.UserInputError):
-        await bot.say("Invalid input.")
+        await ctx.send("Invalid input.")
     else:
-        await bot.say("Oops, something bad happened..")
+        await ctx.send("Oops, something bad happened..")
 
 
 @bot.command()
-async def convert(*, args: str):
+async def convert(ctx, value: float, _from: str, _to: str):
     """Converts a crypto to a crypto or a currency"""
-    bot.type()
-    a = args.split(" ")
-    value = float(a[0])
-    price_from = getPriceValue(a[1].upper())
-    price_to = getPriceValue(a[2].upper())
+    price_from = getPriceValue(_from.upper())
+    price_to = getPriceValue(_to.upper())
     if value is not None and price_from is not None and price_to is not None:
         if price_to[0] == 0:
             total = value * (price_from[1] / price_to[1])
         else:
             total = value * (price_from[1] * price_to[1])
-        await bot.say("{} {} is the same as {} {}".format(roundValue(value), a[1].upper(), roundValue(total), a[2].upper()))
+        await ctx.send("{} {} is the same as {} {}".format(roundValue(value), _from.upper(), roundValue(total), _to.upper()))
 
 
 @convert.error
-async def convert_error(error, ctx):
+async def convert_error(ctx, error):
     """Posts an error message in case of an error with the convert method."""
     print(error)
     if isinstance(error, commands.UserInputError):
-        await bot.say("Invalid input.")
+        await ctx.send("Invalid input.")
     else:
-        await bot.say("Oops, something bad happened..")
+        await ctx.send("Oops, something bad happened..")
 
 
 @bot.command()
-async def source():
+async def source(ctx):
     """Posts a link to the bot GitHub page."""
-    await bot.say("The source can be found here: " +
-                  "https://github.com/FrederikBolding/CryptoBot")
+    await ctx.send("The source can be found here: " +
+                   "https://github.com/FrederikBolding/CryptoBot")
 
 bot.run(token)
