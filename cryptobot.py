@@ -20,16 +20,17 @@ def getTicker(crypto, currency):
         if currency == "":
             currency = "USD"
         crypto_list = requests.get(
-            "https://api.coinmarketcap.com/v1/ticker/").json()
+            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&price_change_percentage=1h%2C24h%2C7d").json()
         last_crypto_update = datetime.now()
         for c in crypto_list:
-            prices = {"USD": c["price_usd"]}
+            prices = {"USD": c["current_price"]}
             for rate in rates:
-                prices[rate] = float(c["price_usd"]) * rates[rate]
+                prices[rate] = float(c["current_price"]) * rates[rate]
+            c["rank"] = crypto_list.index(c) + 1
             c["prices"] = prices
-            c["percent_change_1h"] = formatPercentage(c["percent_change_1h"])
-            c["percent_change_24h"] = formatPercentage(c["percent_change_24h"])
-            c["percent_change_7d"] = formatPercentage(c["percent_change_7d"])
+            c["percent_change_1h"] = formatPercentage(c["price_change_percentage_1h_in_currency"])
+            c["percent_change_24h"] = formatPercentage(c["price_change_percentage_24h_in_currency"])
+            c["percent_change_7d"] = formatPercentage(c["price_change_percentage_7d_in_currency"])
             crypto_dict[c["symbol"].upper()] = c
     if crypto.upper() in crypto_dict:
         return crypto_dict[crypto.upper()]
@@ -49,9 +50,9 @@ def getPriceValue(name):
 def formatPercentage(value):
     if value:
         output = ""
-        if float(value) > 0:
+        if value > 0:
             output += "+"
-        return output + value + "%"
+        return output + "{:.2f}".format(value) + "%"
     return "null"
 
 
@@ -113,7 +114,7 @@ async def ticker(ctx, crypto: str, currency="USD"):
                                                                                                                                        info["prices"][currency])),
                                                                                                                                    currency, info[
                                                                                                                                        "percent_change_1h"],
-                                                                                                                                   info["percent_change_24h"], info["percent_change_7d"]), colour=0x00FF00, timestamp=datetime.fromtimestamp(int(info["last_updated"])))
+                                                                                                                                   info["percent_change_24h"], info["percent_change_7d"]), colour=0x00FF00, timestamp=datetime.strptime(info["last_updated"], "%Y-%m-%dT%H:%M:%S.%fZ"))
             await ctx.send(embed=em)
         else:
             await ctx.send("I couldn't find a currency called: {}".format(currency))
